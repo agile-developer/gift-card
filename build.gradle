@@ -1,15 +1,27 @@
 plugins {
     id 'java'
+    id 'com.github.johnrengelman.shadow' version '4.0.2'
 }
 
-group 'com.paxos.coding'
-version '1.0-SNAPSHOT'
+group = "com.paxos.coding"
+
+shadowJar {
+    baseName = "gift-card"
+    classifier = null
+    version = null
+}
 
 sourceCompatibility = 1.8
 
 repositories {
     mavenCentral()
 }
+
+apply plugin: "java"
+apply plugin: "application"
+apply plugin: "com.github.johnrengelman.shadow"
+
+mainClassName = "com.paxos.coding.giftcard.Main"
 
 dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.12'

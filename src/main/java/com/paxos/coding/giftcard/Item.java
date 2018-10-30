@@ -2,12 +2,16 @@ package com.paxos.coding.giftcard;
 
 import java.util.Objects;
 
-public class Item {
+/**
+ * Immutable domain representation of an item that can be slected/bought.
+ *
+ */
+class Item {
 
     private final String name;
     private final int priceInCents;
 
-    public Item(String name, int priceInCents) {
+    Item(String name, int priceInCents) {
         this.name = name;
         this.priceInCents = priceInCents;
     }
@@ -16,7 +20,7 @@ public class Item {
         return name;
     }
 
-    public int getPriceInCents() {
+    int getPriceInCents() {
         return priceInCents;
     }
 

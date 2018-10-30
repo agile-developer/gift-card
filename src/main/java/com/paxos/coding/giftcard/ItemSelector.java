@@ -4,9 +4,24 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * Implements the selection logic to choose a specified number of items from a list of items <b>sorted</b> by 'price'.
+ *
+ */
 class ItemSelector {
 
-
+    /**
+     * Select a specific number of items, from a given <b>sorted</b> list, such that the value of the chosen items is
+     * minimally under or equal to the amount provided. This method attempts to optimise selection for the number of
+     * items to choose, i.e. try to select {@code numToSelect} over spending {@code amount}.
+     *
+     * @param candidates list of items <b>sorted</b> by price.
+     * @param maxAffordableItemIndex the highest index in the list of an affordable item.
+     *                               Given by calling {@link #searchCutoffIndex(List, int)}. Items beyond this index should be ignored.
+     * @param amount amount (on gift-card) to spend. Value of selected items should be as close or equal to this.
+     * @param numToSelect number of items (gifts) to select.
+     * @return list of selected items of size lte {@code numToSelect}.
+     */
     List<Item> selectItemsForAmount(List<Item> candidates, int maxAffordableItemIndex, int amount, int numToSelect) {
 
         if (candidates == null || candidates.isEmpty() || candidates.size() == 1) return Collections.emptyList();
@@ -30,6 +45,15 @@ class ItemSelector {
         return selectedItems;
     }
 
+    /**
+     * Binary search for the higest index in the <b>sorted</b> {@code items} list, of the item with a price lt {@code amount}.
+     * Any items beyond this index can be safely ignored from the actual selection. If {@code amount} is lte the cheapest item
+     * or if it's gt than the most expensive item, no search is performed and the first or last index is returned accordingly.
+     *
+     * @param items list of items <b>sorted</b> by price.
+     * @param amount amount (on gift-card) to spend.
+     * @return index in the list of the item with a price lt {@code amount}. A value of 0 or -1 means the list cannot be processed.
+     */
     int searchCutoffIndex(List<Item> items, int amount) {
 
         if (items == null || items.isEmpty() || items.size() == 1) return -1;
@@ -68,6 +92,16 @@ class ItemSelector {
         return cutoff;
     }
 
+    /**
+     * Determines if the item under consideration is ok to select given existing situation so far.
+     *
+     * @param numSelected number of items already selected.
+     * @param numToSelect total number of items to select.
+     * @param items list of items <b>sorted</b> by price.
+     * @param amountRemaining amount remaining to be spent.
+     * @param currentCandidatePrice price of the item being currently considered.
+     * @return true if selecting the current candidate improves our chances of meeting our targets, false otherwise.
+     */
     private boolean isOkToSelect(int numSelected, int numToSelect, List<Item> items, int amountRemaining, int currentCandidatePrice) {
 
         int remainingMinusCandidate = amountRemaining - currentCandidatePrice;

@@ -7,10 +7,22 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Convenience class to parse an input file.
+ *
+ */
 class ItemFileReader {
 
     private ItemFileReader() { /* Private constructor */ }
 
+    /**
+     * Parse a file at the given {@code filePath} into a list of {@link Item} objects. If parsing fails for any reason,
+     * then the exception information is captured and the result is wrapped up in a {@link FileResult} object.
+     *
+     * @param filePath complete path to the input file.
+     * @param separator character used to separate columns in the file.
+     * @return result of parsing, encapsulating either success or failure.
+     */
     static FileResult readFile(Path filePath, String separator) {
 
         List<Item> items = Collections.emptyList();
@@ -27,6 +39,12 @@ class ItemFileReader {
         return new FileResult(items, exception);
     }
 
+    /**
+     * Wrapper class containing result from parsing an input file. If parsing is successful, the 'items' will be populated.
+     * If parsing fails, the 'exception' will be set to the cause. A caller can then check both attributes to decide its
+     * course of action.
+     *
+     */
     static class FileResult {
 
         private final List<Item> items;

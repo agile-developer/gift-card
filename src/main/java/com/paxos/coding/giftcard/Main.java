@@ -5,6 +5,14 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 
+/**
+ * Entry point and driver for this program. This class:
+ * <li>validates command-line inputs</li>
+ * <li>invokes the {@link ItemFileReader} to parse the input file</li>
+ * <li>runs the {@link ItemSelector} to choose a specific number of items, within or equal to a given amount</li>
+ * <li>outputs the result of the selection to the console</li>
+ *
+ */
 public class Main {
 
     public static void main(String[] args) {

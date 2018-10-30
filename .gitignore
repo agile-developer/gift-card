@@ -23,6 +23,7 @@ out
 # Gradle
 build
 .gradle
+!gradle/wrapper/gradle-wrapper.jar
 
 # OSX
 .DS_Store

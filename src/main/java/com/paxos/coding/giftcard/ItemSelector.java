@@ -34,7 +34,7 @@ class ItemSelector {
         while (amountRemaining > 0 && numSelected < numToSelect && currentCandidateIndex >= 0) {
             Item currentCandidate = candidates.get(currentCandidateIndex);
             int currentCandidatePrice = currentCandidate.getPriceInCents();
-            if (isOkToSelect(numSelected, numToSelect, candidates, amountRemaining, currentCandidatePrice)) {
+            if (isOkToSelect(numSelected, numToSelect, candidates, amountRemaining, currentCandidateIndex, currentCandidatePrice)) {
                 selectedItems.add(currentCandidate);
                 amountRemaining -= currentCandidatePrice;
                 numSelected++;
@@ -46,9 +46,9 @@ class ItemSelector {
     }
 
     /**
-     * Binary search for the higest index in the <b>sorted</b> {@code items} list, of the item with a price lt {@code amount}.
-     * Any items beyond this index can be safely ignored from the actual selection. If {@code amount} is lte the cheapest item
-     * or if it's gt than the most expensive item, no search is performed and the first or last index is returned accordingly.
+     * Binary search for the higest index in the <b>sorted</b> {@code items} list, of the item with a price less than {@code amount}.
+     * Any items beyond this index can be safely ignored from the actual selection. If {@code amount} is less than or equal to the cheapest item,
+     * or if it's greater than the most expensive item, no search is performed and the first or last index is returned accordingly.
      *
      * @param items list of items <b>sorted</b> by price.
      * @param amount amount (on gift-card) to spend.
@@ -102,12 +102,13 @@ class ItemSelector {
      * @param currentCandidatePrice price of the item being currently considered.
      * @return true if selecting the current candidate improves our chances of meeting our targets, false otherwise.
      */
-    private boolean isOkToSelect(int numSelected, int numToSelect, List<Item> items, int amountRemaining, int currentCandidatePrice) {
+    private boolean isOkToSelect(int numSelected, int numToSelect, List<Item> items, int amountRemaining,
+                                 int currentCandidateIndex, int currentCandidatePrice) {
 
-        int remainingMinusCandidate = amountRemaining - currentCandidatePrice;
-        if ((numSelected + 1) < numToSelect) {
+        if ((numSelected + 1) < numToSelect && currentCandidateIndex > 0) {
             int numRemainingIfCurrentSelected = numToSelect - (numSelected + 1);
             int leastExpensiveItemsPrice = items.stream().limit(numRemainingIfCurrentSelected).mapToInt(Item::getPriceInCents).sum();
+            int remainingMinusCandidate = amountRemaining - currentCandidatePrice;
 
             return remainingMinusCandidate >= leastExpensiveItemsPrice;
         } else {

@@ -75,7 +75,8 @@ public class ItemSelectorTest {
         int cutoff = itemSelector.searchCutoffIndex(items, amountToSpend);
         List<Item> selectedItems = itemSelector.selectItemsForAmount(items, cutoff, amountToSpend, 2);
 
-        assertThat(selectedItems.size(), is(equalTo(0)));
+        assertThat(selectedItems.size(), is(equalTo(1)));
+        assertThat(selectedItems, hasItem(item1));
     }
 
     @Test

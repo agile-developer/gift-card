@@ -10,7 +10,7 @@ The output of the program is a selection of items to buy whose sum is minimally 
 If the specified number of items cannot be bought with the amount provided, the program's output is `Not possible`.
 
 ##### Instructions:
-* This project can be run with Java SE 8 or upwards, and built Gradle 4.8 or upwards.
+* This project can be run with Java SE 8 or upwards, and Gradle 4.8 or upwards.
 * Run `./gradlew clean shadowJar` to build the project. 
 This will create an executable `gift-card.jar` file in the `build/libs` directory.
 * To run the application issue the following command:  

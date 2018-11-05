@@ -3,6 +3,7 @@ package com.paxos.coding.giftcard;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.IntStream;
 
 /**
  * Implements the selection logic to choose a specified number of items from a list of items <b>sorted</b> by 'price'.
@@ -24,17 +25,20 @@ class ItemSelector {
      */
     List<Item> selectItemsForAmount(List<Item> candidates, int maxAffordableItemIndex, int amount, int numToSelect) {
 
-        if (candidates == null || candidates.isEmpty() || candidates.size() == 1) return Collections.emptyList();
+        if (candidates == null || candidates.isEmpty() || candidates.size() == 1 || candidates.size() < numToSelect)
+            return Collections.emptyList();
 
         int numSelected = 0;
         int currentCandidateIndex = maxAffordableItemIndex;
         int amountRemaining = amount;
+        int[] successiveCheapestItemTotals = getSuccessiveCheapestItemTotals(candidates, numToSelect);
         List<Item> selectedItems = new ArrayList<>(numToSelect);
 
-        while (amountRemaining > 0 && numSelected < numToSelect && currentCandidateIndex >= 0) {
+        while ((amountRemaining > 0) && (numSelected < numToSelect) && (currentCandidateIndex >= 0)) {
             Item currentCandidate = candidates.get(currentCandidateIndex);
             int currentCandidatePrice = currentCandidate.getPriceInCents();
-            if (isOkToSelect(numSelected, numToSelect, candidates, amountRemaining, currentCandidateIndex, currentCandidatePrice)) {
+            if (isOkToSelect(numSelected, numToSelect, amountRemaining,
+                currentCandidateIndex, currentCandidatePrice, successiveCheapestItemTotals)) {
                 selectedItems.add(currentCandidate);
                 amountRemaining -= currentCandidatePrice;
                 numSelected++;
@@ -43,6 +47,24 @@ class ItemSelector {
         }
 
         return selectedItems;
+    }
+
+    /**
+     * Convenience method to calculate the successive totals of the cheapest {@code numToSelect} items. This will be used
+     * as a lookup array when deciding to pick an item {@link #isOkToSelect(int, int, int, int, int, int[])},
+     * to ensure that an item's selection leaves room for at least the remaining number of cheapest items.
+     * This helps us optimize for number of items to select.
+     *
+     * @param candidates list of candidates.
+     * @param numToSelect number of items to select.
+     * @return array containing the successive totals of {@code numToSelect} items.
+     */
+    private int[] getSuccessiveCheapestItemTotals(List<Item> candidates, int numToSelect) {
+        return IntStream.range(0, numToSelect)
+                .map(i -> (i == 0)
+                    ? candidates.get(i).getPriceInCents()
+                    : candidates.get(i - 1).getPriceInCents() + candidates.get(i).getPriceInCents())
+                .toArray();
     }
 
     /**
@@ -97,17 +119,18 @@ class ItemSelector {
      *
      * @param numSelected number of items already selected.
      * @param numToSelect total number of items to select.
-     * @param items list of items <b>sorted</b> by price.
      * @param amountRemaining amount remaining to be spent.
+     * @param currentCandidateIndex index of the current index in the items list.
      * @param currentCandidatePrice price of the item being currently considered.
+     * @param successiveCheapestItemTotals lookup array containing the successive totals of the cheapest items.
      * @return true if selecting the current candidate improves our chances of meeting our targets, false otherwise.
      */
-    private boolean isOkToSelect(int numSelected, int numToSelect, List<Item> items, int amountRemaining,
-                                 int currentCandidateIndex, int currentCandidatePrice) {
+    private boolean isOkToSelect(int numSelected, int numToSelect, int amountRemaining,
+                                 int currentCandidateIndex, int currentCandidatePrice, int[] successiveCheapestItemTotals) {
 
         if ((numSelected + 1) < numToSelect && currentCandidateIndex > 0) {
             int numRemainingIfCurrentSelected = numToSelect - (numSelected + 1);
-            int leastExpensiveItemsPrice = items.stream().limit(numRemainingIfCurrentSelected).mapToInt(Item::getPriceInCents).sum();
+            int leastExpensiveItemsPrice = successiveCheapestItemTotals[numRemainingIfCurrentSelected - 1];
             int remainingMinusCandidate = amountRemaining - currentCandidatePrice;
 
             return remainingMinusCandidate >= leastExpensiveItemsPrice;

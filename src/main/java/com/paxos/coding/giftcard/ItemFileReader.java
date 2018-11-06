@@ -28,7 +28,8 @@ class ItemFileReader {
         List<Item> items = Collections.emptyList();
         Exception exception = null;
         try {
-            items = Files.lines(filePath).map(lineItem -> {
+            items = Files.lines(filePath).filter(lineItem -> lineItem != null && !lineItem.isEmpty())
+                .map(lineItem -> {
                 String[] itemNameAndPrice = lineItem.split(separator);
                 return new Item(itemNameAndPrice[0].trim(), Integer.parseInt(itemNameAndPrice[1].trim()));
             }).collect(Collectors.toList());
